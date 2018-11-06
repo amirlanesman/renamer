@@ -1,0 +1,28 @@
+{
+  "name": "Renamer",
+  "description": "Application for formatting video files",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "10.11.0"
+  },
+  "scripts": {
+    "start": "node bin/run"
+  },
+  "dependencies": {
+    "debug": "~2.6.9",
+    "dotenv": "^6.1.0",
+    "episode-parser": "^1.2.0",
+    "fs-extra": "^7.0.0",
+    "imdb-api": "^4.0.2",
+    "minimist": "^1.2.0",
+    "morgan": "~1.9.0",
+    "node-tvdb": "^4.1.0",
+    "pad-number": "0.0.4",
+    "string-template": "^1.0.0",
+    "video-name-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "pm2": "^3.2.2"
+  }
+}

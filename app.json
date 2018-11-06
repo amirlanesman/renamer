@@ -1,0 +1,8 @@
+{
+  "name": "Renamer",
+  "description": "Application for formatting video files",
+  "repository": "https://github.com/lanesman",
+  "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/master/public/node.svg",
+  "keywords": ["node", "rename", "videos"],
+  "image": "heroku/nodejs"
+}
