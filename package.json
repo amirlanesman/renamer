@@ -19,6 +19,7 @@
     "morgan": "~1.9.0",
     "node-tvdb": "^4.1.0",
     "pad-number": "0.0.4",
+    "sanitize-filename": "^1.6.1",
     "string-template": "^1.0.0",
     "video-name-parser": "^1.4.6"
   },

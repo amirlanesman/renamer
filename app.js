@@ -4,6 +4,8 @@ var format = require("string-template");
 var fs = require('fs-extra');
 var path = require('path');
 var parseVideo = require("video-name-parser");
+var sanitize = require("sanitize-filename");
+var os = require('os')
 
 //var fileDataHandler = require('');
 
@@ -28,8 +30,26 @@ function getFiles(path, filter, fileCallback) {
   fromDir(path, filter, fileCallback);
 }
 
+function getLogLine(log) {
+  return new Date().toLocaleString() + "\t" + log + os.EOL;
+}
+
+function logToFile(log) {
+  fs.ensureDir(path.dirname(config.logs.moveLog), (err) => {
+    if (!err) {
+      fs.ensureFile(config.logs.moveLog, (err1) => {
+        if (!err1) {
+          fs.appendFile(config.logs.moveLog, getLogLine(log), () => { });
+        }
+      });
+    }
+  });
+}
+
 function repathFile(oldNewFile, callback) {
-  console.log(`Moving '${oldNewFile.oldPath}' => '${oldNewFile.newPath}'`);
+  let log = `Moving '${oldNewFile.oldPath}' => '${oldNewFile.newPath}'`;
+  console.log(log);
+  logToFile(log);
   let dir = path.dirname(oldNewFile.newPath);
   fs.ensureDir(dir, (err) => {
     if (err)
@@ -63,6 +83,30 @@ function renameFiles(config) {
   // });
 }
 
+function sanitizeData(data) {
+  let obj = {}
+  Object.keys(data).forEach(function(key) {
+    if (data[key] && data[key].replace)
+      obj[key] = sanitize(data[key], {replacement: "-"});
+    else
+      obj[key]=data[key];
+  });
+  return obj;
+}
+
+function sanitizePath(filePath){
+  let arr = filePath.split(path.sep);
+  for (let i = 0; i < arr.length; i++) {
+    arr[i] = sanitize(arr[i], {replacement: "-"});
+  }
+  let sanitizedPath = path.join.apply(null, arr);
+  if (filePath.startsWith(path.sep))
+    sanitizedPath = path.sep + sanitizedPath;
+  if (filePath.endsWith(path.sep))
+    sanitizedPath = sanitizedPath + path.sep;
+  return sanitizedPath;
+}
+
 async function handleFilename(fetchers, oldPath) {
   try {
     let filename = path.basename(oldPath);
@@ -71,7 +115,7 @@ async function handleFilename(fetchers, oldPath) {
     if (fetcher) {
       let dataForFileName = await fetcher.fetcher.getDataForFileName(filename);
       let newPath = format(fetcher.newPath, dataForFileName);
-      return {oldPath: oldPath, newPath: newPath}; 
+      return {oldPath: oldPath, newPath: sanitizePath(newPath)}; 
     }
   } catch (error) {
     console.log(`Couldn't get new path for file: ${oldPath}`);

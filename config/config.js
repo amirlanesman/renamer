@@ -9,6 +9,9 @@ const config = {
   },
   episodeFetcher: {
     dbFile: process.env.EPISODE_FETCHER_DB_FILE || './user/episode-db.json'
+  },
+  logs: {
+    moveLog: process.env.RENAMER_MOVE_LOG || './user/movelog.txt'
   }
 };
 
