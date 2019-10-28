@@ -12,7 +12,21 @@ const config = {
   },
   logs: {
     moveLog: process.env.RENAMER_MOVE_LOG || './user/movelog.txt'
+  },
+  fileMover: {
+    processedFilesDbFile: process.env.PROCESSED_FILES_DB_FILE || './user/processed_files.txt'
+  },
+  sync: {
+    syncBackoffCheckMs: 3000,
+    syncBackoffMs: 1000,
+  },
+  mediaManager: {
+    command: process.env.MEDIA_MANAGER_COMMAND,
+    args: process.env.MEDIA_MANAGER_ARGS ? [process.env.MEDIA_MANAGER_ARGS.split(' ')] : ['-update', '-scrapeUnscraped']
+  },
+  kodi: {
+    updateUrl:  process.env.KODI_UPDATE_URL || 'http://localhost:8088/jsonrpc'
   }
-};
+}
 
 module.exports = config;

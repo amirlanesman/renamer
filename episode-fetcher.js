@@ -26,7 +26,7 @@ function canonizeShowNameForForce(name) {
 }
 
 function saveForce() {
-  fs.writeJson(showDbFile, force);
+  fs.writeJson(showDbFile, force, { spaces: 2 });
 }
 
 async function getTvdbShow(fileData) {
