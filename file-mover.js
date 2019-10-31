@@ -29,9 +29,13 @@ async function processFiles(path, execConfig) {
     return
   }
   const filteredFiles = files.filter(file => (!processedFiles || !processedFiles.includes(file)))
-  const successful = (await Promise.all(filteredFiles.map(async file => {    
-    if (await handleFile(file, execConfig)) {
-      return file
+  const successful = (await Promise.all(filteredFiles.map(async file => {   
+    try { 
+      if (await handleFile(file, execConfig)) {
+        return file
+      } 
+    } catch (error) {
+      console.log(`failed handling file: ${file}`, error)
     }
   }))).filter(f => (!!f))
   await saveProcessedFiles(successful)
