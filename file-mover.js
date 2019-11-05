@@ -89,7 +89,7 @@ async function handleFile(file, execConfig) {
   if (videoFilePattern.test(file)) {
     return handleVideoFile(file, execConfig)
   } else if (rarFilePattern.test(file)) {
-    return handleRarFile(file, execConfig)
+    return handleRarFile(file, execConfig, videoFilePattern)
   }
   return false
 }
@@ -103,7 +103,7 @@ async function handleVideoFile(file, execConfig) {
   return await copyFile(file, newPath)
 }
 
-async function handleRarFile(file, execConfig) {
+async function handleRarFile(file, execConfig, videoFilePattern) {
   const files = await listRar(file)
   const filtered = files.filter(name => (videoFilePattern.test(name)))
   if (!filtered || filtered.length === 0) {
