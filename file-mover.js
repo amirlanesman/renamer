@@ -2,11 +2,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const renamer = require('./renamerV2')
-const unpacker = require('all-unpacker')
-const util = require('util')
-const listRar = util.promisify(unpacker.list)
-const unpackOnly = util.promisify(unpacker.unpackonly)
 const config = require('./config/config')
+const {listRar, extractFilesRar} = require('./rarHandler')
 var os = require('os')
 
 async function logToFile(log) {
@@ -90,27 +87,35 @@ async function handleFile(file, execConfig) {
   const videoFilePattern = new RegExp(execConfig.videoFilter)
   const rarFilePattern = new RegExp(execConfig.rarFilter)
   if (videoFilePattern.test(file)) {
-    const filename = path.basename(file)
-    const newPath = await renamer.getFileData(execConfig.fetchers, filename)
-    if (!newPath) {
-      return false
-    }
-    return await copyFile(file, newPath)
-  } else if (/.+(\.rar)$/.test(file)) {
-    const files = await listRar(file, {})
-    const filtered = files.filter(name => (videoFilePattern.test(name)))
-    if (!filtered || filtered.length === 0) {
-      return true
-    }
-    console.log(`unpacking file '${file}' to '${execConfig.unpackDir}' with files:`, filtered)
-    await unpackOnly(file, execConfig.unpackDir, filtered)
-    const res = await Promise.all(filtered.map(async filename => {
-      const newPath = await renamer.getFileData(execConfig.fetchers, filename)
-      return await moveFile(path.join(execConfig.unpackDir, filename), newPath)
-    }))
-    return (!res.every(r => (r)))
+    return handleVideoFile(file, execConfig)
+  } else if (rarFilePattern.test(file)) {
+    return handleRarFile(file, execConfig)
   }
   return false
+}
+
+async function handleVideoFile(file, execConfig) {
+  const filename = path.basename(file)
+  const newPath = await renamer.getFileData(execConfig.fetchers, filename)
+  if (!newPath) {
+    return false
+  }
+  return await copyFile(file, newPath)
+}
+
+async function handleRarFile(file, execConfig) {
+  const files = await listRar(file)
+  const filtered = files.filter(name => (videoFilePattern.test(name)))
+  if (!filtered || filtered.length === 0) {
+    return true
+  }
+  console.log(`unpacking file '${file}' to '${execConfig.unpackDir}' with files:`, filtered)
+  await extractFilesRar(file, execConfig.unpackDir, filtered)
+  const res = await Promise.all(filtered.map(async filename => {
+    const newPath = await renamer.getFileData(execConfig.fetchers, filename)
+    return await moveFile(path.join(execConfig.unpackDir, filename), newPath)
+  }))
+  return (!res.every(r => (r)))
 }
 
 async function copyFile(oldPath, newPath) {
