@@ -115,7 +115,7 @@ async function handleRarFile(file, execConfig, videoFilePattern) {
     const newPath = await renamer.getFileData(execConfig.fetchers, filename)
     return await moveFile(path.join(execConfig.unpackDir, filename), newPath)
   }))
-  return (!res.every(r => (r)))
+  return (res.every(r => (r)))
 }
 
 async function copyFile(oldPath, newPath) {
