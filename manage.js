@@ -1,7 +1,7 @@
 const argv = require('minimist')(process.argv.slice(2));
 const sync = require('./sync')
 const runMediaManager = require('./runMediaManager').runMediaManager
-const updateMediaLibrary = require('./updateMediaLibrary').updateMediaLibrary
+const refreshAllTvShows = require('./updateMediaLibrary').refreshAllTvShows
 
 async function main() {
   console.log(`Starting manage of library`)
@@ -13,7 +13,7 @@ async function main() {
   }
   await sync.startSync(execConfig.syncFile)
   await runMediaManager()
-  await updateMediaLibrary()
+  await refreshAllTvShows()
   sync.stopSync()
 }
 
