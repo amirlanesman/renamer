@@ -6,8 +6,8 @@ async function updateMediaLibrary() {
   await request.post(config.kodi.updateUrl, { body: JSON.stringify({ jsonrpc: "2.0", method: "VideoLibrary.Scan", id: "renamer" }) })
 }
 
-async function refreshTvShow(tvshowid) {
-  console.log(`calling refresh tvshow ${tvshowid} url`)
+async function refreshTvShow(tvshow) {
+  console.log(`calling refresh tvshow ${tvshow} url`)
   await request.post(config.kodi.updateUrl, {
     body: JSON.stringify({
       jsonrpc: "2.0",
@@ -15,7 +15,7 @@ async function refreshTvShow(tvshowid) {
       id: "renamer",
       params: {
         refreshepisodes: true,
-        tvshowid,
+        tvshowid: tvshow.tvshowid,
       }
     })
   })
@@ -42,7 +42,7 @@ async function refreshAllTvShows() {
   const tvshows = await getAllTvShows()
   if (tvshows) {
     for (let i = 0; i < tvshows.length; i++) {
-      await refreshTvShow(tvshows[i].tvshowid)
+      await refreshTvShow(tvshows[i])
     }
   } else {
     console.log(`Couldn't get tv shows`)
