@@ -31,6 +31,7 @@ async function getAllTvShows() {
       id: "renamer",
     })
   })
+  console.log({res})
   const {tvshows} = res
   return tvshows
 }
