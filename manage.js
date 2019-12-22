@@ -12,7 +12,7 @@ async function main() {
     return;
   }
   await sync.startSync(execConfig.syncFile)
-  // await runMediaManager()
+  await runMediaManager()
   await refreshAllTvShows()
   sync.stopSync()
 }
