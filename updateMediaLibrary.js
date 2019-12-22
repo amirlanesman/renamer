@@ -25,6 +25,9 @@ async function getAllTvShows() {
 	console.log(`calling get all tvshows url`)
   const res = await request.post(config.kodi.updateUrl, {
     json: true,
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       jsonrpc: "2.0", 
       method: "VideoLibrary.GetTVShows", 
