@@ -24,13 +24,14 @@ async function refreshTvShow(tvshowid) {
 async function getAllTvShows() {
 	console.log(`calling get all tvshows url`)
   const res = await request.post(config.kodi.updateUrl, {
+    json: true,
     body: JSON.stringify({
       jsonrpc: "2.0", 
       method: "VideoLibrary.GetTVShows", 
       id: "renamer",
     })
   })
-  const {tvshows} = await res.json()
+  const {tvshows} = res
   return tvshows
 }
 
