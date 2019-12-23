@@ -7,7 +7,7 @@ async function updateMediaLibrary() {
 }
 
 async function refreshTvShow(tvshow) {
-  console.log(`calling refresh tvshow ${tvshow} url`)
+  console.log(`calling refresh tvshow ${JSON.stringify(tvshow)} url`)
   await request.post(config.kodi.updateUrl, {
     body: JSON.stringify({
       jsonrpc: "2.0",
