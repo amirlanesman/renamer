@@ -29,8 +29,12 @@ async function getFileHandle(syncFile) {
     await writePidToFile(syncFile)
     console.log(`waiting for ${config.sync.syncBackoffCheckMs} to check sync`)
     await sleep(config.sync.syncBackoffCheckMs)
-    current = await fs.readJson(syncFile)
-    console.log(`found pid sync`, current)
+    try {
+      current = await fs.readJson(syncFile)
+      console.log(`found pid sync`, current)
+    } catch (error) {
+      console.log(`couldn't read json from sync file:`, error)
+    }
   }
   console.log(`writing pid ${process.pid} to sync file again`)
   await writePidToFile(syncFile)  
