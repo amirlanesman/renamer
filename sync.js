@@ -23,23 +23,29 @@ function stopSync() {
 }
 
 async function getFileHandle(syncFile) {
-  let current = {}
-  while (current.pid !== process.pid) {
-    if (!current.timeNumber || (new Date().getTime() - current.timeNumber > config.sync.syncBackoffMs)) {
+  let current = await getCurrentSync()
+  do {
+    if (!current || !current.timeNumber || (new Date().getTime() - current.timeNumber > config.sync.syncBackoffMs)) {
       console.log(`writing pid ${process.pid} to sync file`)
       await writePidToFile(syncFile)
     }
     console.log(`waiting for ${config.sync.syncBackoffCheckMs} to check sync`)
     await sleep(config.sync.syncBackoffCheckMs)
-    try {
-      current = await fs.readJson(syncFile)
-      console.log(`found pid sync`, current)
-    } catch (error) {
-      console.log(`couldn't read json from sync file:`, error)
-    }
-  }
+    current = await getCurrentSync()
+  } while (current.pid !== process.pid)
   console.log(`writing pid ${process.pid} to sync file again`)
   await writePidToFile(syncFile)  
+}
+
+async function getCurrentSync() {
+  let current
+  try {
+    current = await fs.readJson(syncFile)
+    console.log(`found pid sync`, current)
+  } catch (error) {
+    console.log(`couldn't read json from sync file:`, error)
+  }
+  return current
 }
 
 async function writePidToFile(syncFile) {
