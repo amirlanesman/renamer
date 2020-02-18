@@ -32,12 +32,12 @@ async function getFileHandle(syncFile) {
     console.log(`waiting for ${config.sync.syncBackoffCheckMs} to check sync`)
     await sleep(config.sync.syncBackoffCheckMs)
     current = await getCurrentSync()
-  } while (current.pid !== process.pid)
+  } while (!current || current.pid !== process.pid)
   console.log(`writing pid ${process.pid} to sync file again`)
   await writePidToFile(syncFile)  
 }
 
-async function getCurrentSync() {
+async function getCurrentSync(syncFile) {
   let current
   try {
     current = await fs.readJson(syncFile)
