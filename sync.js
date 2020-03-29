@@ -25,8 +25,8 @@ function stopSync() {
 async function getFileHandle(syncFile) {
   let current = await getCurrentSync(syncFile)
   do {
-    if (!current || !current.timeNumber || (new Date().getTime() - current.timeNumber > config.sync.syncBackoffMs)) {
-      console.log(`writing pid ${process.pid} to sync file`)
+    const now = new Date()
+    if (!current || !current.timeNumber || (now.getTime() - current.timeNumber > config.sync.syncBackoffCheckMs)) {
       await writePidToFile(syncFile)
     }
     console.log(`waiting for ${config.sync.syncBackoffCheckMs} to check sync`)
@@ -49,7 +49,10 @@ async function getCurrentSync(syncFile) {
 }
 
 async function writePidToFile(syncFile) {
-  await fs.writeJson(syncFile, {pid: process.pid, time: new Date(), timeNumber: new Date().getTime() }, {flag: 'w'})
+  const now = new Date()
+  const obj = {pid: process.pid, time: now, timeNumber: now.getTime() }
+  console.log(`writing pid to sync file:`, obj)
+  await fs.writeJson(syncFile, obj, {flag: 'w'})
 }
 
 function sleep(ms) {
