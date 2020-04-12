@@ -23,6 +23,7 @@ async function processFiles(path, execConfig) {
   console.log(`processing path '${path}'`)
   const files = (await getFiles(path, new RegExp(execConfig.fileFilter)))
   if (!files) {
+    console.log(`Couldn't find any files in ${path} to match /${execConfig.fileFilter}/`)
     return
   }
   const filteredFiles = files.filter(file => (!processedFiles || !processedFiles.includes(file)))
