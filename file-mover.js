@@ -17,7 +17,7 @@ function getLogLine(log) {
   return new Date().toLocaleString() + "\t" + log + os.EOL;
 }
 
-async function processFiles(path, execConfig) {
+async function processFiles(path, execConfig, keepFiles = true) {
   const processedFiles = await getProcessedFiles()
   execConfig.fetchers = renamer.getFetchers(execConfig)
   console.log(`processing path '${path}'`)
@@ -29,7 +29,7 @@ async function processFiles(path, execConfig) {
   const filteredFiles = files.filter(file => (!processedFiles || !processedFiles.includes(file)))
   const successful = (await Promise.all(filteredFiles.map(async file => {   
     try { 
-      if (await handleFile(file, execConfig)) {
+      if (await handleFile(file, execConfig, keepFiles)) {
         return file
       } 
     } catch (error) {
@@ -84,24 +84,28 @@ async function getFiles(p,filter){
   }
 }
 
-async function handleFile(file, execConfig) {
+async function handleFile(file, execConfig, keepFile) {
   const videoFilePattern = new RegExp(execConfig.videoFilter)
   const rarFilePattern = new RegExp(execConfig.rarFilter)
   if (videoFilePattern.test(file)) {
-    return handleVideoFile(file, execConfig)
+    return handleVideoFile(file, execConfig, keepFile)
   } else if (rarFilePattern.test(file)) {
     return handleRarFile(file, execConfig, videoFilePattern)
   }
   return false
 }
 
-async function handleVideoFile(file, execConfig) {
+async function handleVideoFile(file, execConfig, keepFile) {
   const filename = path.basename(file)
   const newPath = await renamer.getFileData(execConfig.fetchers, filename)
   if (!newPath) {
     return false
   }
-  return await copyFile(file, newPath)
+  if (keepFile) {
+    return await copyFile(file, newPath)
+  } else {
+    return await moveFile(file, newPath)
+  }
 }
 
 async function handleRarFile(file, execConfig, videoFilePattern) {
@@ -125,10 +129,9 @@ async function copyFile(oldPath, newPath) {
     return false
   }
   try {
-    let log = `copying '${oldPath}' => '${newPath}'`;
-    await logToFile(log);
-    let dir = path.dirname(newPath);
+    await logToFile(`copying '${oldPath}' => '${newPath}'`);
     console.log(`ensuring ${dir}`)
+    let dir = path.dirname(newPath);
     await fs.ensureDir(dir)
     await fs.copy(oldPath, newPath);
     return true

@@ -8,6 +8,7 @@ async function main() {
   console.log(`Starting rename`)
   const execConfig = require(argv.config || './user/exec-config');
   const path = argv.path
+  const keepFiles = !argv.discardFiles
   if (!execConfig) {
     console.log("could not find config file ", execConfig);
     return;
@@ -17,9 +18,12 @@ async function main() {
     return;
   }
   await sync.startSync(execConfig.syncFile)
-  await fileMover.processFiles(path, execConfig)
+  await fileMover.processFiles(path, execConfig, keepFiles)
+  console.log('moved files, starting media manager')
   await runMediaManager()
+  console.log('finished media manager, starting library update')
   await updateMediaLibrary()
+  console.log('finished library update')
   sync.stopSync()
 }
 
