@@ -130,7 +130,6 @@ async function copyFile(oldPath, newPath) {
   }
   try {
     await logToFile(`copying '${oldPath}' => '${newPath}'`);
-    console.log(`ensuring ${dir}`)
     let dir = path.dirname(newPath);
     await fs.ensureDir(dir)
     await fs.copy(oldPath, newPath);
