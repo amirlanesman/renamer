@@ -33,7 +33,7 @@ async function processFiles(path, execConfig, keepFiles = true) {
     } catch (error) {
       console.log(`failed handling file: ${file}`, error)
     }
-  }))).filter(f => (f && f.file))
+  }))).filter(f => (f && f.commands))
   const successful = await runFileCommands(commands)
   await saveProcessedFiles(successful)
 }
