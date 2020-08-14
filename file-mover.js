@@ -40,6 +40,7 @@ async function processFiles(path, execConfig, keepFiles = true) {
 
 async function runFileCommands(commands) { 
   const successful = [];
+  console.log(commands)
   for (const command of commands) {
     if (await runCommands(command.commands)){
       successful.push(files)
