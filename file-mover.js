@@ -43,7 +43,7 @@ async function runFileCommands(commands) {
   console.log(commands)
   for (const command of commands) {
     if (await runCommands(command.commands)){
-      successful.push(files)
+      successful.push(command.file)
     }
   }
   return successful
