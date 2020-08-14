@@ -6,6 +6,11 @@ async function updateMediaLibrary() {
   await request.post(config.kodi.updateUrl, { body: JSON.stringify({ jsonrpc: "2.0", method: "VideoLibrary.Scan", id: "renamer" }) })
 }
 
+async function cleanVideoLibrary() {
+  console.log(`calling clean video library url`)
+  await request.post(config.kodi.updateUrl, { body: JSON.stringify({ jsonrpc: "2.0", method: "VideoLibrary.Clean", id: "renamer" }) })
+}
+
 async function refreshTvShow(tvshow) {
   console.log(`calling refresh tvshow ${JSON.stringify(tvshow)} url`)
   await request.post(config.kodi.updateUrl, {
@@ -49,4 +54,4 @@ async function refreshAllTvShows() {
   }
 }
 
-module.exports = { updateMediaLibrary, refreshAllTvShows }
+module.exports = { updateMediaLibrary, refreshAllTvShows, cleanVideoLibrary }

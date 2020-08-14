@@ -27,16 +27,42 @@ async function processFiles(path, execConfig, keepFiles = true) {
     return
   }
   const filteredFiles = files.filter(file => (!processedFiles || !processedFiles.includes(file)))
-  const successful = (await Promise.all(filteredFiles.map(async file => {   
+  const commands = (await Promise.all(filteredFiles.map(async file => {   
     try { 
-      if (await handleFile(file, execConfig, keepFiles)) {
-        return file
-      } 
+      return {file, commands: await handleFile(file, execConfig, keepFiles)}
     } catch (error) {
       console.log(`failed handling file: ${file}`, error)
     }
-  }))).filter(f => (!!f))
+  }))).filter(f => (f && f.file))
+  const successful = await runFileCommands(commands)
   await saveProcessedFiles(successful)
+}
+
+async function runFileCommands(commands) { 
+  const successful = [];
+  console.log(commands)
+  for (const command of commands) {
+    if (await runCommands(command.commands)){
+      successful.push(files)
+    }
+  }
+  return successful
+}
+
+async function runCommands(commands) {
+  let successful = true;
+  for (const command of commands) {
+    try {
+      if(command.type === 'copy') {
+        successful = successful && await copyFile(command.file, command.newPath)
+      } else if(command.type === 'move') {
+        successful = successful && await moveFile(command.file, command.newPath)
+      }
+    } catch (e) {
+      successful = false
+    }
+  }
+  return successful
 }
 
 async function getProcessedFiles() {
@@ -88,27 +114,27 @@ async function handleFile(file, execConfig, keepFile) {
   const videoFilePattern = new RegExp(execConfig.videoFilter)
   const rarFilePattern = new RegExp(execConfig.rarFilter)
   if (videoFilePattern.test(file)) {
-    return handleVideoFile(file, execConfig, keepFile)
+    return await getVideoFileCommands(file, execConfig, keepFile)
   } else if (rarFilePattern.test(file)) {
-    return handleRarFile(file, execConfig, videoFilePattern)
+    return await getRarFileCommands(file, execConfig, videoFilePattern)
   }
-  return false
+  return undefined
 }
 
-async function handleVideoFile(file, execConfig, keepFile) {
+async function getVideoFileCommands(file, execConfig, keepFile) {
   const filename = path.basename(file)
   const newPath = await renamer.getFileData(execConfig.fetchers, filename)
   if (!newPath) {
     return false
   }
   if (keepFile) {
-    return await copyFile(file, newPath)
+    return [{type: 'copy', file, newPath}];
   } else {
-    return await moveFile(file, newPath)
+    return [{type: 'move', file, newPath}];
   }
 }
 
-async function handleRarFile(file, execConfig, videoFilePattern) {
+async function getRarFileCommands(file, execConfig, videoFilePattern) {
   const files = await listRar(file)
   const filtered = files.filter(name => (videoFilePattern.test(name)))
   if (!filtered || filtered.length === 0) {
@@ -118,9 +144,9 @@ async function handleRarFile(file, execConfig, videoFilePattern) {
   await extractFilesRar(file, execConfig.unpackDir, filtered)
   const res = await Promise.all(filtered.map(async filename => {
     const newPath = await renamer.getFileData(execConfig.fetchers, filename)
-    return await moveFile(path.join(execConfig.unpackDir, filename), newPath)
+    return {type: 'move', file: path.join(execConfig.unpackDir, filename), newPath};
   }))
-  return (res.every(r => (r)))
+  return res;
 }
 
 async function copyFile(oldPath, newPath) {
