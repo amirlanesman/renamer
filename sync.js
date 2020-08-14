@@ -2,6 +2,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const process = require('process')
 const config = require('./config/config')
+const util = require('util')
 
 let syncInterval = undefined
 
@@ -51,7 +52,7 @@ async function getCurrentSync(syncFile) {
 async function writePidToFile(syncFile) {
   const now = new Date()
   const obj = {pid: process.pid, time: now, timeNumber: now.getTime() }
-  console.log(`writing pid to sync file:`, obj)
+  console.log(`writing pid to sync file:`, JSON.stringify(obj))
   await fs.writeJson(syncFile, obj, {flag: 'w'})
 }
 
