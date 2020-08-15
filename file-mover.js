@@ -4,7 +4,8 @@ const path = require('path');
 const renamer = require('./renamerV2')
 const config = require('./config/config')
 const {listRar, extractFilesRar} = require('./rarHandler')
-var os = require('os')
+const os = require('os')
+const {inspect} = require('util')
 
 async function logToFile(log) {
   console.log(log)
@@ -40,7 +41,7 @@ async function processFiles(path, execConfig, keepFiles = true) {
 
 async function runFileCommands(commands) { 
   const successful = [];
-  console.log(commands)
+  console.log('running commands: ', inspect(commands, undefined, null, true))
   for (const command of commands) {
     if (await runCommands(command.commands)){
       successful.push(command.file)
@@ -151,7 +152,7 @@ async function getRarFileCommands(file, execConfig, videoFilePattern) {
 
 async function copyFile(oldPath, newPath) {
   if (!newPath) {
-    console.log(`not moving '${oldPath}' because missing new path`)
+    console.log(`not copying '${oldPath}' because missing new path`)
     return false
   }
   try {
