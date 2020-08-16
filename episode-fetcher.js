@@ -1,5 +1,5 @@
 var config = require('./config/config');
-var parser = require('episode-parser');
+var parser = require('./episode-parser');
 var pad = require('pad-number');
 var fs = require('fs-extra');
 var path = require('path');
