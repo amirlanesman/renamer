@@ -34,6 +34,7 @@ async function getFileData(fetchers, filename, forcedType) {
   try {
     let type = forcedType || parseVideo(filename).type;
     let fetcher = fetchers[type];
+    console.log('got type', type, fetchers[type]);
     if (fetcher) {
       let dataForFileName = await fetcher.fetcher.getDataForFileName(filename);
       let newPath = format(fetcher.newPath, dataForFileName);
