@@ -30,7 +30,7 @@ async function processFiles(path, execConfig, keepFiles = true, forcedType) {
   const filteredFiles = files.filter(file => (!processedFiles || !processedFiles.includes(file)))
   const commands = (await Promise.all(filteredFiles.map(async file => {   
     try { 
-      return {file, commands: await handleFile(file, execConfig, keepFiles)}
+      return {file, commands: await handleFile(file, execConfig, keepFiles, forcedType)}
     } catch (error) {
       console.log(`failed handling file: ${file}`, error)
     }
