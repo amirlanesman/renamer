@@ -115,9 +115,9 @@ async function handleFile(file, execConfig, keepFile, forcedType) {
   const videoFilePattern = new RegExp(execConfig.videoFilter)
   const rarFilePattern = new RegExp(execConfig.rarFilter)
   if (videoFilePattern.test(file)) {
-    return await getVideoFileCommands(file, execConfig, keepFile)
+    return await getVideoFileCommands(file, execConfig, keepFile, forcedType)
   } else if (rarFilePattern.test(file)) {
-    return await getRarFileCommands(file, execConfig, videoFilePattern)
+    return await getRarFileCommands(file, execConfig, videoFilePattern, forcedType)
   }
   return undefined
 }
