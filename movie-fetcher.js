@@ -16,9 +16,8 @@ async function getDataForFileName(filename) {
   let fileData = parseVideo(filename);
   if (!fileData)
     throw new Error(`File is not a movie: ${filename}`);
-  if (!fileData.name || fileData.type !== "movie")
+  if (!fileData.name)
     throw new Error(`Could not parse file name ${filename}: name='${fileData.show}' type=${fileData.type}`);
-
 
   let movie = await getMovieData(fileData);  
   return (({ title, year }) => (
@@ -29,4 +28,4 @@ async function getDataForFileName(filename) {
     }))(movie);
 }
 
-module.exports = {getDataForFileName: getDataForFileName};
+module.exports = {getDataForFileName};

@@ -30,9 +30,9 @@ function sanitizePath(filePath){
   return sanitizedPath;
 }
 
-async function getFileData(fetchers, filename) {
+async function getFileData(fetchers, filename, forcedType) {
   try {
-    let type = parseVideo(filename).type;
+    let type = forcedType || parseVideo(filename).type;
     let fetcher = fetchers[type];
     if (fetcher) {
       let dataForFileName = await fetcher.fetcher.getDataForFileName(filename);

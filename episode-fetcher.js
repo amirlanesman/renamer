@@ -79,4 +79,4 @@ async function getDataForFileName(filename) {
 
 
 
-module.exports = {getDataForFileName: getDataForFileName};
+module.exports = {getDataForFileName};

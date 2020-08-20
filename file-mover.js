@@ -18,12 +18,12 @@ function getLogLine(log) {
   return new Date().toLocaleString() + "\t" + log + os.EOL;
 }
 
-async function processFiles(path, execConfig, keepFiles = true) {
+async function processFiles(path, execConfig, keepFiles = true, forcedType) {
   const processedFiles = await getProcessedFiles()
   execConfig.fetchers = renamer.getFetchers(execConfig)
   console.log(`processing path '${path}'`)
   const files = (await getFiles(path, new RegExp(execConfig.fileFilter)))
-  if (!files) {
+  if (!files || files.length === 0) {
     console.log(`Couldn't find any files in ${path} to match /${execConfig.fileFilter}/`)
     return
   }
@@ -111,7 +111,7 @@ async function getFiles(p,filter){
   }
 }
 
-async function handleFile(file, execConfig, keepFile) {
+async function handleFile(file, execConfig, keepFile, forcedType) {
   const videoFilePattern = new RegExp(execConfig.videoFilter)
   const rarFilePattern = new RegExp(execConfig.rarFilter)
   if (videoFilePattern.test(file)) {
@@ -122,9 +122,9 @@ async function handleFile(file, execConfig, keepFile) {
   return undefined
 }
 
-async function getVideoFileCommands(file, execConfig, keepFile) {
+async function getVideoFileCommands(file, execConfig, keepFile, forcedType) {
   const filename = path.basename(file)
-  const newPath = await renamer.getFileData(execConfig.fetchers, filename)
+  const newPath = await renamer.getFileData(execConfig.fetchers, filename, forcedType)
   if (!newPath) {
     return false
   }
@@ -135,7 +135,7 @@ async function getVideoFileCommands(file, execConfig, keepFile) {
   }
 }
 
-async function getRarFileCommands(file, execConfig, videoFilePattern) {
+async function getRarFileCommands(file, execConfig, videoFilePattern, forcedType) {
   const files = await listRar(file)
   const filtered = files.filter(name => (videoFilePattern.test(name)))
   if (!filtered || filtered.length === 0) {
@@ -144,7 +144,7 @@ async function getRarFileCommands(file, execConfig, videoFilePattern) {
   console.log(`unpacking file '${file}' to '${execConfig.unpackDir}' with files:`, filtered)
   await extractFilesRar(file, execConfig.unpackDir, filtered)
   const res = await Promise.all(filtered.map(async filename => {
-    const newPath = await renamer.getFileData(execConfig.fetchers, filename)
+    const newPath = await renamer.getFileData(execConfig.fetchers, filename, forcedType)
     return {type: 'move', file: path.join(execConfig.unpackDir, filename), newPath};
   }))
   return res;

@@ -9,6 +9,7 @@ async function main() {
   const execConfig = require(argv.config || './user/exec-config');
   const path = argv.path
   const keepFiles = !argv.discardFiles
+  const forcedType = argv.forceType
   if (!execConfig) {
     console.log("could not find config file ", execConfig);
     return;
@@ -18,7 +19,7 @@ async function main() {
     return;
   }
   await sync.startSync(execConfig.syncFile)
-  await fileMover.processFiles(path, execConfig, keepFiles)
+  await fileMover.processFiles(path, execConfig, keepFiles, forcedType)
   console.log('moved files, starting media manager')
   await runMediaManager()
   console.log('finished media manager, starting library update')
