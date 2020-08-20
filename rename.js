@@ -19,6 +19,7 @@ async function main() {
     return;
   }
   await sync.startSync(execConfig.syncFile)
+  console.log('starting processing files with config:', {path, execConfig, keepFiles, forcedType})
   await fileMover.processFiles(path, execConfig, keepFiles, forcedType)
   console.log('moved files, starting media manager')
   await runMediaManager()
