@@ -22,7 +22,7 @@ const config = {
   },
   mediaManager: {
     command: process.env.MEDIA_MANAGER_COMMAND,
-    args: process.env.MEDIA_MANAGER_ARGS ? [process.env.MEDIA_MANAGER_ARGS.split(' ')] : ['-update', '-scrapeUnscraped']
+    args: process.env.MEDIA_MANAGER_ARGS ? [...process.env.MEDIA_MANAGER_ARGS.split(';').map(s => s.split(' '))] : [['movie', '-u', '--scrapeUnscraped'], ['tvshow', '-u', '--scrapeUnscraped']]
   },
   kodi: {
     updateUrl:  process.env.KODI_UPDATE_URL || 'http://192.168.0.183:8088/jsonrpc'

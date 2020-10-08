@@ -2,8 +2,14 @@ const config = require('./config/config')
 const spawn = require('child-process-promise').spawn;
  
 async function runMediaManager() {
-  console.log(`spawning media manager:`, config.mediaManager.command, config.mediaManager.args);
-  const promise = spawn(config.mediaManager.command, config.mediaManager.args);
+  for (const args of config.mediaManager.args) {
+    await runMediaManagerInstance(config.mediaManager.command, args)
+  }
+}
+
+async function runMediaManagerInstance(command, args) {
+  console.log(`spawning media manager:`, command, args);
+  const promise = spawn(command, args);
    
   const childProcess = promise.childProcess;
 

@@ -55,7 +55,9 @@ async function getDataForFileName(filename) {
     throw new Error(`Could not parse file name ${filename}: show='${fileData.show}' season=${fileData.season} && episode=${fileData.episode}`);
 
   let show = await getTvdbShow(fileData);
+  console.log({show})
   let episodes = await tvdb.getEpisodesBySeriesId(show.id);
+  console.log({episodes})
   if (episodes.length <= 0)
     throw new Error(`Couldn't find show name ${fileData.show}`);
   
