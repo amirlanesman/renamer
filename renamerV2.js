@@ -32,7 +32,12 @@ function sanitizePath(filePath){
 
 async function getFileData(fetchers, filename, forcedType) {
   try {
-    let type = forcedType || await parseVideo(filename).type;
+    let type = forcedType;
+    if (!type) {
+      const data = await parseVideo(filename);
+      console.log('got data:', data);
+      type = data.type;
+    }
     let fetcher = fetchers[type];
     console.log(`for '${filename}' got type=${type} and forceType was '${forcedType}' resulting in fetcher:`, fetchers[type])
     // console.log('got type and forced type:', {types: {forcedType, type}, fetcher: fetchers[type]});
