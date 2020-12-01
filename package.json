@@ -20,6 +20,7 @@
     "morgan": "~1.9.0",
     "node-tvdb": "^4.1.0",
     "pad-number": "0.0.4",
+    "promise-exec": "^0.1.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "sanitize-filename": "^1.6.1",

@@ -1,5 +1,5 @@
 var config = require('./config/config');
-var parser = require('./episode-parser');
+var {parseVideo: parser} = require('./video-parser');
 var pad = require('pad-number');
 var fs = require('fs-extra');
 var path = require('path');
@@ -29,18 +29,18 @@ function saveForce() {
   fs.writeJson(showDbFile, force, { spaces: 2 });
 }
 
-async function getTvdbShow(fileData) {
-  let canonicalShowName = canonizeShowNameForForce(fileData.show);
+async function getTvdbShow(showTitle) {
+  let canonicalShowName = canonizeShowNameForForce(showTitle);
   let showId = force[canonicalShowName];
   if (showId){
     let show = await tvdb.getSeriesById(showId);
     if (!show)
-      throw new Error(`Couldn't find show name ${fileData.show} with id ${showId}`);
+      throw new Error(`Couldn't find show name ${showTitle} with id ${showId}`);
     return show;
   } else {
-    let series = await tvdb.getSeriesByName(fileData.show);
+    let series = await tvdb.getSeriesByName(showTitle);
     if (series.length <= 0)
-      throw new Error(`Couldn't find show name ${fileData.show}`);
+      throw new Error(`Couldn't find show name ${showTitle}`);
     force[canonicalShowName] = series[0].id;
     saveForce();
     return series[0];
@@ -48,16 +48,16 @@ async function getTvdbShow(fileData) {
 }
 
 async function getDataForFileName(filename) {
-  let fileData = parser(filename);
+  let fileData = await parser(filename);
   if (!fileData)
     throw new Error(`File is not an episode: ${filename}`);
   if (!fileData.show || fileData.season == undefined || fileData.episode == undefined)
     throw new Error(`Could not parse file name ${filename}: show='${fileData.show}' season=${fileData.season} && episode=${fileData.episode}`);
 
-  let show = await getTvdbShow(fileData);
-  console.log({show})
+  let show = await getTvdbShow(fileData.show);
+  console.log('found show: ', show)
   let episodes = await tvdb.getEpisodesBySeriesId(show.id);
-  console.log({episodes})
+  // console.log('with episodes: ', episodes)
   if (episodes.length <= 0)
     throw new Error(`Couldn't find show name ${fileData.show}`);
   

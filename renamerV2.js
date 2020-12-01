@@ -3,7 +3,7 @@ var path = require('path');
 var format = require("string-template");
 var fs = require('fs-extra');
 var path = require('path');
-var parseVideo = require("video-name-parser");
+var {parseVideo} = require("./video-parser");
 var sanitize = require("sanitize-filename");
 
 function getFetchers(config) {
@@ -32,9 +32,10 @@ function sanitizePath(filePath){
 
 async function getFileData(fetchers, filename, forcedType) {
   try {
-    let type = forcedType || parseVideo(filename).type;
+    let type = forcedType || await parseVideo(filename).type;
     let fetcher = fetchers[type];
-    console.log('got type and forced type:', {forcedType, type}, fetchers[type]);
+    console.log(`for '${filename}' got type=${type} and forceType was '${forcedType}' resulting in fetcher:`, fetchers[type])
+    // console.log('got type and forced type:', {types: {forcedType, type}, fetcher: fetchers[type]});
     if (fetcher) {
       let dataForFileName = await fetcher.fetcher.getDataForFileName(filename);
       let newPath = format(fetcher.newPath, dataForFileName);
