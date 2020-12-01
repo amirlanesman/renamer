@@ -6,7 +6,9 @@ var parseVideoNode = require("video-name-parser");
 const exec = require('child-process-promise').exec;
 
 async function parseVideo(filename) {
-  const res = await exec(`guessit -n -j "${filename}"`);
+  const command = `guessit -n -j "${filename}"`;
+  console.log('executing: \n' + command);
+  const res = await exec(command);
   // console.log('guessit returned:\n>>>>'+ res.stdout + '<<<<');
   let data = JSON.parse(res.stdout);
   return {
